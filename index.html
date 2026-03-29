@@ -896,7 +896,7 @@
 <!-- ===== NAVIGATION ===== -->
 <nav class="navbar">
   <a href="#" class="nav-logo">&#9889; CRESCENDO</a>
-  <button class="mobile-menu-btn" onclick="toggleMenu()" aria-label="Menu">&#9776;</button>
+  <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle navigation menu" aria-controls="navLinks" aria-expanded="false">&#9776;</button>
   <ul class="nav-links" id="navLinks">
     <li><a href="#home">Home</a></li>
     <li><a href="#how-it-works">How It Works</a></li>
@@ -1116,12 +1116,12 @@
     </div>
 
     <div class="prize-filters">
-      <button class="filter-btn active" onclick="filterPrizes('all')">All</button>
-      <button class="filter-btn" onclick="filterPrizes('tech')">Tech</button>
-      <button class="filter-btn" onclick="filterPrizes('toys')">Toys & Games</button>
-      <button class="filter-btn" onclick="filterPrizes('beauty')">Beauty</button>
-      <button class="filter-btn" onclick="filterPrizes('creative')">Creative</button>
-      <button class="filter-btn" onclick="filterPrizes('school')">School & Decor</button>
+      <button class="filter-btn active" data-filter="all" aria-pressed="true">All</button>
+      <button class="filter-btn" data-filter="tech" aria-pressed="false">Tech</button>
+      <button class="filter-btn" data-filter="toys" aria-pressed="false">Toys & Games</button>
+      <button class="filter-btn" data-filter="beauty" aria-pressed="false">Beauty</button>
+      <button class="filter-btn" data-filter="creative" aria-pressed="false">Creative</button>
+      <button class="filter-btn" data-filter="school" aria-pressed="false">School & Decor</button>
     </div>
 
     <div class="prize-grid" id="prizeGrid"></div>
@@ -1240,14 +1240,29 @@
     });
   }
 
-  function filterPrizes(cat) {
+  function filterPrizes(cat, activeBtn) {
     var btns = document.querySelectorAll('.filter-btn');
-    for (var i = 0; i < btns.length; i++) btns[i].classList.remove('active');
-    event.target.classList.add('active');
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].classList.remove('active');
+      btns[i].setAttribute('aria-pressed', 'false');
+    }
+
+    if (activeBtn) {
+      activeBtn.classList.add('active');
+      activeBtn.setAttribute('aria-pressed', 'true');
+    }
+
     renderPrizes(cat);
   }
 
   renderPrizes('all');
+
+  var filterButtons = document.querySelectorAll('.filter-btn');
+  for (var k = 0; k < filterButtons.length; k++) {
+    filterButtons[k].addEventListener('click', function() {
+      filterPrizes(this.getAttribute('data-filter'), this);
+    });
+  }
 
   // ===== HERO STARS =====
   var starsContainer = document.getElementById('heroStars');
@@ -1264,14 +1279,21 @@
   }
 
   // ===== MOBILE MENU =====
+  var menuButton = document.getElementById('mobileMenuBtn');
+  var navLinks = document.getElementById('navLinks');
+
   function toggleMenu() {
-    document.getElementById('navLinks').classList.toggle('open');
+    var isOpen = navLinks.classList.toggle('open');
+    menuButton.setAttribute('aria-expanded', String(isOpen));
   }
+
+  menuButton.addEventListener('click', toggleMenu);
 
   var navAs = document.querySelectorAll('.nav-links a');
   for (var j = 0; j < navAs.length; j++) {
     navAs[j].addEventListener('click', function() {
-      document.getElementById('navLinks').classList.remove('open');
+      navLinks.classList.remove('open');
+      menuButton.setAttribute('aria-expanded', 'false');
     });
   }
 </script>
