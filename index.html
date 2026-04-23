@@ -233,12 +233,95 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
+  .countdown-wrap {
+    margin: 18px auto 0;
+    max-width: 620px;
+    animation: slideUp 0.5s ease-out 0.4s both;
+  }
+
+  .countdown-label {
+    font-family: 'Lilita One', cursive;
+    font-size: clamp(0.95rem, 2.4vw, 1.15rem);
+    color: var(--white);
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    text-transform: none;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.45);
+  }
+
+  .countdown-timer {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(90px, 1fr));
+    gap: 12px;
+    justify-content: center;
+  }
+
+  .countdown-unit {
+    background: rgba(10, 16, 69, 0.72);
+    border: 3px solid var(--black);
+    border-radius: 4px;
+    padding: 14px 10px 12px;
+    box-shadow: 4px 4px 0 var(--black);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .countdown-unit::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 10px 10px;
+    pointer-events: none;
+  }
+
+  .countdown-number,
+  .countdown-text {
+    position: relative;
+    z-index: 1;
+  }
+
+  .countdown-number {
+    display: block;
+    font-family: 'Bangers', cursive;
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    color: var(--gold-star);
+    line-height: 1;
+    letter-spacing: 2px;
+    text-shadow: 2px 2px 0 var(--black);
+  }
+
+  .countdown-text {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.75rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--off-white);
+  }
+
+  .countdown-complete {
+    margin-top: 12px;
+    display: inline-block;
+    background: linear-gradient(135deg, var(--gold-star), var(--gold-warm));
+    color: var(--blue-dark);
+    font-family: 'Bangers', cursive;
+    font-size: 1.05rem;
+    letter-spacing: 2px;
+    padding: 10px 18px;
+    border-radius: 4px;
+    border: 3px solid var(--black);
+    box-shadow: 4px 4px 0 var(--black);
+  }
+
   .hero-badges {
     display: flex;
     gap: 12px;
     justify-content: center;
     flex-wrap: wrap;
     animation: slideUp 0.5s ease-out 0.5s both;
+    margin-top: 24px;
   }
 
   .hero-badge {
@@ -888,6 +971,9 @@
     .prize-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
     section { padding: 60px 16px; }
     .leaderboard-grid { grid-template-columns: 1fr; }
+    .countdown-timer {
+      grid-template-columns: repeat(2, minmax(120px, 1fr));
+    }
   }
 </style>
 </head>
@@ -943,6 +1029,29 @@
       </div>
     </div>
     <p class="hero-tagline">Earn HABIT / TEST Points &bull; Unlock Epic Prizes</p>
+
+    <div class="countdown-wrap" aria-live="polite">
+      <p class="countdown-label">ELA NY State Test begins in…</p>
+      <div class="countdown-timer" id="countdownTimer">
+        <div class="countdown-unit">
+          <span class="countdown-number" id="days">0</span>
+          <span class="countdown-text">Days</span>
+        </div>
+        <div class="countdown-unit">
+          <span class="countdown-number" id="hours">0</span>
+          <span class="countdown-text">Hours</span>
+        </div>
+        <div class="countdown-unit">
+          <span class="countdown-number" id="minutes">0</span>
+          <span class="countdown-text">Minutes</span>
+        </div>
+        <div class="countdown-unit">
+          <span class="countdown-number" id="seconds">0</span>
+          <span class="countdown-text">Seconds</span>
+        </div>
+      </div>
+    </div>
+
     <div class="hero-badges">
       <span class="hero-badge">&#9733; 34 Prizes</span>
       <span class="hero-badge">&#9889; Grand Prize: HP Laptop</span>
@@ -1151,6 +1260,37 @@
 </footer>
 
 <script>
+  // ===== ELA TEST COUNTDOWN =====
+  var elaTestDate = new Date('2026-04-28T08:30:00');
+
+  function updateCountdown() {
+    var now = new Date();
+    var diff = elaTestDate - now;
+
+    var timer = document.getElementById('countdownTimer');
+    if (!timer) return;
+
+    if (diff <= 0) {
+      timer.innerHTML =
+        '<div class="countdown-complete">⚡ The ELA NY State Test has begun! ⚡</div>';
+      return;
+    }
+
+    var totalSeconds = Math.floor(diff / 1000);
+    var days = Math.floor(totalSeconds / 86400);
+    var hours = Math.floor((totalSeconds % 86400) / 3600);
+    var minutes = Math.floor((totalSeconds % 3600) / 60);
+    var seconds = totalSeconds % 60;
+
+    document.getElementById('days').textContent = days;
+    document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+    document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+    document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+  }
+
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
   // ===== PRIZES DATA =====
   // Standard = 10pts, Premium = 20pts, Grand = 50pts
   var prizes = [
